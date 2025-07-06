@@ -29,6 +29,12 @@ main{
 .container{
     display: flex;
     flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    height: 80vh;
+
+    row-gap: 30px;
 }
 
 #urlBox{
@@ -37,6 +43,7 @@ main{
     
     display: flex;
     flex-direction: row !important;
+    gap: 10px;
 
     padding: 20px;
 
@@ -57,9 +64,36 @@ main{
     border-radius: 5px;
 }
 
-#convertBTN{
+/* #convertBTN{
     background-image: url("Assets/svg/cnvBTN.svg");
     width: 200px; height: 200px;
+} */
+
+.convertBTN{
+    background-image: url("Assets/svg/cnvBTN.svg");
+    width: 200px; height: 100px;
+
+    transition-duration: 0.4s;
+
+    border: none;
+    cursor: pointer;
+    background-color: white;
+    /* background:none; */
+
+    transform: scale(1,1);
+}
+.convertBTN:hover{
+    background-image: url("Assets/svg/cnvBTN.svg");
+    width: 200px; height: 100px;
+
+    /* transition-duration: 0.4s; */
+
+    border: none;
+    cursor: pointer;
+    background-color: white;
+    /* background:none; */
+
+    transform: scale(1.1,1.1);
 }
 
 footer{

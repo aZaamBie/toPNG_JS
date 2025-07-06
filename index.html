@@ -8,15 +8,17 @@
         <meta name="author" content="Azaam Holdman">
 
         <link rel="stylesheet" type="text/css" href="styles.css">
-        <script src="index.js"></script>
-
+        
         <title>To PNG</title>
 
         <!-- "looking" at this website for inspiration: https://www.adobe.com/express/feature/image/convert/jpg-to-png -->
-         <!-- this library: https://www.npmjs.com/package/image-conversion -->
+        <!-- this library: https://www.npmjs.com/package/image-conversion -->
 
          <!-- library web-based -->
-         <!-- <script src="https://cdn.jsdelivr.net/gh/WangYuLue/image-conversion/build/conversion.js"></script> -->
+        <!-- <script src="https://cdn.jsdelivr.net/gh/WangYuLue/image-conversion/build/conversion.js"></script> -->
+        <script src="https://unpkg.com/image-conversion/dist/image-conversion.min.js"></script>
+
+        <!-- <script src="index.js"></script> -->
 
     </head>
 
@@ -30,18 +32,22 @@
                 <div id="urlBox">
                     
                     <p>Url:</p>
-                    <input id="inputURL" type="url" onchange="convert()">
+                    <input id="inputURL" type="url">
 
                 </div>
 
-                <div id="convertBTN">
+                <button class="convertBTN">Convert:</button>
+
+                <!-- <div id="convertBTN">
                     <p>Convert:</p>
-                </div>
+                </div> -->
 
             </div>
             
        </main>
 
+
+    <script src="index.js"></script>
     </body>
 
 
