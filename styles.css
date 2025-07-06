@@ -46,8 +46,20 @@ main{
     transition: all 0.3s ease-in-out;
 }
 
-#urlBox :hover{
-    box-shadow: 1px 10px 1px rgba(0, 0, 0, 0.9);
+#urlBox:hover{
+    box-shadow: 0px 15px 1px rgba(0, 0, 0, 1.0);
+
+    transition: all 0.2s ease-in-out;
+}
+
+#inputURL{
+    border: 4px dashed rgb(0, 0, 31);
+    border-radius: 5px;
+}
+
+#convertBTN{
+    background-image: url("Assets/svg/cnvBTN.svg");
+    width: 200px; height: 200px;
 }
 
 footer{
