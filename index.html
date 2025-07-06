@@ -7,13 +7,40 @@
         <meta name="keywords" content="To Png, PNG converter">
         <meta name="author" content="Azaam Holdman">
 
+        <link rel="stylesheet" type="text/css" href="styles.css">
+        <script src="index.js"></script>
+
         <title>To PNG</title>
 
         <!-- "looking" at this website for inspiration: https://www.adobe.com/express/feature/image/convert/jpg-to-png -->
+         <!-- this library: https://www.npmjs.com/package/image-conversion -->
+
+         <!-- library web-based -->
+         <!-- <script src="https://cdn.jsdelivr.net/gh/WangYuLue/image-conversion/build/conversion.js"></script> -->
+
     </head>
 
     <body>
-        <h1> Convert to PNG:</h1>
+
+        <main>
+            <h1> Convert to PNG:</h1>
+
+            <div class="container">
+
+                <div id="urlBox">
+                    
+                    <p>Url:</p>
+                    <input id="inputURL" type="url" onchange="convert()">
+
+                </div>
+
+                <div id="convertBTN">
+                    <p>Convert:</p>
+                </div>
+
+            </div>
+            
+       </main>
 
     </body>
 
