@@ -42,11 +42,13 @@ function convert() {
         // setTimeout( close, 1000) // set timer for 1000ms(1s) and then close
     }
     else{ // then proceed with conversion
-        console.log("Can convert")
+        // console.log("Can convert")
         console.log("converting the file: " + url);
         convertBTN.innerHTML = "Converting"
 
-        console.log(fileExt + " is file extension") 
+        // console.log(fileExt + " is file extension") 
+
+        let newFile = imageConversion.dataURLtoFile(url, ["image/png"])
     }
 
     
