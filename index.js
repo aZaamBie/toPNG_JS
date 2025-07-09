@@ -1,5 +1,6 @@
 // import * as imageConversion from 'image-conversion'; // import the libary for image conversion
 // const imageConversion = require("image-conversion") // import the libary for image conversion
+// const imageConversion = await import('https://unpkg.com/image-conversion/dist/image-conversion.min.js');
 
 const convertBTN = document.querySelector(".convertBTN"); // NOTE: ALWAYS PUT A BLOODY FULL STOP when calling a class
 const inpURL = document.getElementById("inputURL")
@@ -7,6 +8,21 @@ const inpURL = document.getElementById("inputURL")
 convertBTN.addEventListener("click", convert) // add event listener for mouse clicks
 
 var url = inpURL.value // global / hoisted var
+
+// check if Library is loaded
+
+// document.addEventListener('DOMContentLoaded', () => {
+//     // Check if the library is loaded
+//     if (typeof imageConversion === 'undefined') {
+//         console.error('image-conversion library not loaded!');
+//         return; } 
+// } )
+
+if (typeof imageConversion === 'undefined') {
+  throw new Error("image-conversion library failed to load! Check the CDN script.");
+}
+
+// proceed
 
 function updateURL() {
     url = inpURL.value
@@ -46,9 +62,20 @@ function convert() {
         console.log("converting the file: " + url);
         convertBTN.innerHTML = "Converting"
 
-        // console.log(fileExt + " is file extension") 
+        // let newFile = imageConversion.dataURLtoFile(url, ["image/png"])
 
-        let newFile = imageConversion.dataURLtoFile(url, ["image/png"])
+        // let newImg = imageConversion.dataURLtoImage(url)
+        
+        // imageConversion.downloadFile(newFile)
+        
+        // attempt 2
+        let response = fetch(url)
+        let blob = response.blob()
+        
+        let pngIMG = imageConversion.compress(blob,1.0)
+        imageConversion.downloadFile(pngIMG)
+
+
     }
 
     
