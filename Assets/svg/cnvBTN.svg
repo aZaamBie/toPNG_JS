@@ -1,5 +1,21 @@
-<svg width="200" height="100" xmlns="http://www.w3.org/2000/svg">
+<svg width="200" height="100" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 100" class="arrow-svg">
     <!-- <polygon points="0,50 0,150 200,100" fill="rgb(255, 255, 255)" /> -->
-    <polygon points="0,0 0,100 200,50" fill="#003459" /> 
+    <!-- <polygon points="0,0 0,100 200,50" fill="#003459" />  -->
     <!--  #003459  #beb7a4-->
+
+    <defs>
+        <filter id="arrowShadow" x="-20%" y="-20%" width="140%" height="140%">
+        <feGaussianBlur in="SourceAlpha" stdDeviation="3" result="blur"/>
+        <feOffset dx="2" dy="2" result="offsetBlur"/>
+        <feFlood flood-color="rgba(0,0,0,0.5)" result="shadowColor"/>
+        <feComposite in="shadowColor" in2="offsetBlur" operator="in" result="coloredShadow"/>
+        <feMerge>
+            <feMergeNode in="coloredShadow"/>
+            <feMergeNode in="SourceGraphic"/>
+        </feMerge>
+        </filter>
+    </defs>
+    
+    <!-- Your arrow -->
+    <path class="arrow" d="M0,0 L0,100 L200,50 Z" fill="#003459"/>
 </svg>

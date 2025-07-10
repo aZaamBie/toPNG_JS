@@ -15,7 +15,8 @@
         <!-- this library: https://www.npmjs.com/package/image-conversion -->
 
          <!-- library web-based -->
-        <script src="https://cdn.jsdelivr.net/gh/WangYuLue/image-conversion/build/conversion.js"></script>
+        <!-- <script src="https://cdn.jsdelivr.net/gh/WangYuLue/image-conversion/build/conversion.js"></script> -->
+        <script src="https://cdn.jsdelivr.net/npm/image-conversion@2.2.2/dist/image-conversion.min.js"></script>
 
         <!-- <script src="index.js"></script> -->
 
@@ -39,8 +40,31 @@
 
                 </div>
 
-                <button class="convertBTN">Convert:</button>
+                <button class="convertBTN">Convert:
+                    <svg width="200" height="100" viewBox="0 0 200 100" class="arrow-svg">
+                        <defs>
+                            <!-- Arrow shadow filter -->
+                            <filter id="arrowShadow" x="-20%" y="-20%" width="140%" height="140%">
+                                <feGaussianBlur in="SourceAlpha" stdDeviation="3" result="blur"/>
+                                <feOffset dx="2" dy="2" result="offsetBlur"/>
+                                <feFlood flood-color="rgba(0,0,0,0.5)" result="shadowColor"/>
+                                <feComposite in="shadowColor" in2="offsetBlur" operator="in" result="coloredShadow"/>
+                                <feMerge>
+                                    <feMergeNode in="coloredShadow"/>
+                                    <feMergeNode in="SourceGraphic"/>
+                                </feMerge>
+                            </filter>
+                        </defs>
+                        <!-- The arrow itself -->
+                        <polygon points="0,0 0,100 200,50" fill="#003459" class="arrow"/> 
+                    </svg>
+                </button>
 
+                <div class="imgPreview">
+                    <canvas id="previewCanv">
+
+                    </canvas>
+                </div>
                 <!-- <div id="convertBTN">
                     <p>Convert:</p>
                 </div> -->
@@ -50,8 +74,8 @@
        </main>
 
 
-    <script async src="index.js"></script>
-    <!-- <script type="module" src="index.js"></script> -->
+    <!-- <script async src="index.js"></script> -->
+    <script src="index.js"></script>
     </body>
 
 

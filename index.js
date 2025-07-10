@@ -1,6 +1,7 @@
 // import * as imageConversion from 'image-conversion'; // import the libary for image conversion
+// import * as imageConversion from './node_modules/image-conversion/dist/image-conversion.min.js';
 // const imageConversion = require("image-conversion") // import the libary for image conversion
-// const imageConversion = await import('https://unpkg.com/image-conversion/dist/image-conversion.min.js');
+
 
 const convertBTN = document.querySelector(".convertBTN"); // NOTE: ALWAYS PUT A BLOODY FULL STOP when calling a class
 const inpURL = document.getElementById("inputURL")
@@ -11,16 +12,16 @@ var url = inpURL.value // global / hoisted var
 
 // check if Library is loaded
 
-// document.addEventListener('DOMContentLoaded', () => {
-//     // Check if the library is loaded
-//     if (typeof imageConversion === 'undefined') {
-//         console.error('image-conversion library not loaded!');
-//         return; } 
-// } )
+document.addEventListener('DOMContentLoaded', () => {
+    // Check if the library is loaded
+    if (typeof imageConversion === 'undefined') {
+        console.error('image-conversion library not loaded!');
+        return; } 
+} )
 
-if (typeof imageConversion === 'undefined') {
-  throw new Error("image-conversion library failed to load! Check the CDN script.");
-}
+// if (typeof imageConversion === 'undefined') {
+//   throw new Error("image-conversion library failed to load! Check the CDN script.");
+// }
 
 // proceed
 
@@ -41,11 +42,9 @@ function isPNG(type) {
 
 
 
-function convert() {
+async function convert() {
     updateURL() // get latest url
     let fileExt = url.slice(url.length-3, url.length).toLowerCase()
-
-    
     // console.log("converting the file: " + url);
     
     
@@ -58,22 +57,35 @@ function convert() {
         // setTimeout( close, 1000) // set timer for 1000ms(1s) and then close
     }
     else{ // then proceed with conversion
-        // console.log("Can convert")
+
         console.log("converting the file: " + url);
         convertBTN.innerHTML = "Converting"
 
         // let newFile = imageConversion.dataURLtoFile(url, ["image/png"])
-
         // let newImg = imageConversion.dataURLtoImage(url)
-        
         // imageConversion.downloadFile(newFile)
         
         // attempt 2
-        let response = fetch(url)
-        let blob = response.blob()
+        // let response = fetch(url)
+        // let blob = response.blob()
         
-        let pngIMG = imageConversion.compress(blob,1.0)
-        imageConversion.downloadFile(pngIMG)
+        // let pngIMG = imageConversion.compress(blob,1.0)
+        // imageConversion.downloadFile(pngIMG)
+
+        // attempt 3
+        // 1. First await the fetch to get the Response object
+        const response = await fetch(`https://cors-anywhere.herokuapp.com/${url}`);
+
+        // 3. Now await the blob() method on the Response
+        const blob = await response.blob();
+
+        if (!blob.type.startsWith('image/')) {
+            throw new Error('The URL does not point to an image file');
+        }
+        
+        const pngBlob = await imageConversion.compress(blob, 1.0); // convert image
+
+        imageConversion.downloadFile(pngBlob, "converted.png") // download
 
 
     }
