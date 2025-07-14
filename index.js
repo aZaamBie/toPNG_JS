@@ -5,6 +5,7 @@
 
 
 const convertBTN = document.querySelector(".convertBTN"); // NOTE: ALWAYS PUT A BLOODY FULL STOP when calling a class
+const btnText = document.getElementById("btnText")
 const inpURL = document.getElementById("inputURL")
 // inpURL.addEventListener("submit", )
 convertBTN.addEventListener("click", convert) // add event listener for mouse clicks
@@ -69,12 +70,10 @@ async function convert() {
     else{ // then proceed with conversion
 
         console.log("converting the file: " + url);
-        convertBTN.textContent = "Converting"
+        btnText.textContent = "Converting"
 
         
         // attempt 2
-        // const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
-        // let response = await fetch(proxyUrl + url)
         let response = await fetch(url)
         let blob = await response.blob()
         
@@ -100,7 +99,10 @@ async function convert() {
 
         // imageConversion.downloadFile(pngBlob, "converted.png") // download
 
-
+        btnText.textContent = "Finished conversion"
+        setTimeout( // reset the button text \\
+            () => {btnText.textContent = "Convert"} // pass an arrow-function, so that text isn't immediately changed
+            , 2000) // after 2 seconds
     }
 
     
