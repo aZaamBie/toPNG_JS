@@ -1,5 +1,6 @@
 // import * as imageConversion from 'image-conversion'; // import the libary for image conversion
 // import * as imageConversion from './node_modules/image-conversion/dist/image-conversion.min.js';
+// import * as imageConversion from 'node_modules/image-conversion/build/conversion.js';
 // const imageConversion = require("image-conversion") // import the libary for image conversion
 
 
@@ -9,6 +10,7 @@ const inpURL = document.getElementById("inputURL")
 convertBTN.addEventListener("click", convert) // add event listener for mouse clicks
 
 var url = inpURL.value // global / hoisted var
+var urlList = [];
 
 // check if Library is loaded
 
@@ -25,8 +27,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // proceed
 
-function updateURL() {
+function updateURL() { // get most recent url
     url = inpURL.value
+    urlList.push(url)
+
+
+    // check the most recent entered URL's \\
+    // for (x in urlList){ // check whether url already exists in list
+    //     if x
+    // }
+
+    // console.log(urlList)
 }
 
 function hasURL(  ) { // check if the input box contains a valid url
@@ -45,7 +56,6 @@ function isPNG(type) {
 async function convert() {
     updateURL() // get latest url
     let fileExt = url.slice(url.length-3, url.length).toLowerCase()
-    // console.log("converting the file: " + url);
     
     
     if (!hasURL()){ // first check if has a URL
@@ -59,33 +69,36 @@ async function convert() {
     else{ // then proceed with conversion
 
         console.log("converting the file: " + url);
-        convertBTN.innerHTML = "Converting"
+        convertBTN.textContent = "Converting"
 
-        // let newFile = imageConversion.dataURLtoFile(url, ["image/png"])
-        // let newImg = imageConversion.dataURLtoImage(url)
-        // imageConversion.downloadFile(newFile)
         
         // attempt 2
-        // let response = fetch(url)
-        // let blob = response.blob()
+        // const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
+        // let response = await fetch(proxyUrl + url)
+        let response = await fetch(url)
+        let blob = await response.blob()
         
-        // let pngIMG = imageConversion.compress(blob,1.0)
-        // imageConversion.downloadFile(pngIMG)
+        // let pngIMG = await imageConversion.compress(blob,1.0)
+        let pngIMG = await imageConversion.compress(blob, {
+            quality: 1.0,
+            type: "image/png"}
+        );
+        imageConversion.downloadFile(pngIMG)
 
         // attempt 3
         // 1. First await the fetch to get the Response object
-        const response = await fetch(`https://cors-anywhere.herokuapp.com/${url}`);
+        // const response = await fetch(`https://cors-anywhere.herokuapp.com/${url}`);
 
-        // 3. Now await the blob() method on the Response
-        const blob = await response.blob();
+        // // 3. Now await the blob() method on the Response
+        // const blob = await response.blob();
 
-        if (!blob.type.startsWith('image/')) {
-            throw new Error('The URL does not point to an image file');
-        }
+        // if (!blob.type.startsWith('image/')) {
+        //     throw new Error('The URL does not point to an image file');
+        // }
         
-        const pngBlob = await imageConversion.compress(blob, 1.0); // convert image
+        // const pngBlob = await imageConversion.compress(blob, 1.0); // convert image
 
-        imageConversion.downloadFile(pngBlob, "converted.png") // download
+        // imageConversion.downloadFile(pngBlob, "converted.png") // download
 
 
     }
