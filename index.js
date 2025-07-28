@@ -6,7 +6,13 @@
 const convertBTN = document.querySelector(".convertBTN"); // NOTE: ALWAYS PUT A BLOODY FULL STOP when calling a class
 const btnText = document.getElementById("btnText")
 const inpURL = document.getElementById("inputURL")
+const urlBox = document.getElementById("urlBox")
 convertBTN.addEventListener("click", convert) // add event listener for mouse clicks
+
+inpURL.addEventListener("change", getPreviewName() )
+
+urlBox.addEventListener("mouseover", previewHover(true))
+urlBox.addEventListener("mouseout", previewHover(false))
 
 var url = inpURL.value // global / hoisted var
 var urlList = [];
@@ -84,7 +90,8 @@ async function convert() {
         let parts = url.split("/")
         let filename = parts[parts.length-1]
         // get the substring from index 0 , until and excluding the last 4 characters (which are the full stop and file extension)
-        let newFname = filename.substring(0,filename.length-3) +  targetType // + "png"
+        // let newFname = filename.substring(0,filename.length-3) +  targetType // + "png"
+        let newFname= getPreviewName(filename, targetType)
         // alert(filename) //  testing purposes
 
         imageConversion.downloadFile(pngIMG, newFname) // download image with new filename as associated file name
@@ -110,9 +117,23 @@ async function convert() {
             , 2000) // after 2 seconds
     }
 
-    
 }
 
+function getPreviewName(name="", type=targetType){
+    let newName = name.substring(0, name.length-3) + type;
+    const fName = document.getElementById("namePreview")
+    fName.innerHTML = "Preview filename: " + newName
+    return fName
+}
+
+function previewHover(active) {
+    const fName = document.getElementById("namePreview")
+    if (active) {
+        fName.classList.add("preview-animated");
+        console.log("mouse over preview");
+    } else {fName.classList.remove("preview-animated"); console.log("mouse exit preview")}
+    
+}
 
 // test image (THESE ARE CC-0):
 /*  https://cdn.stocksnap.io/img-thumbs/280h/house-cat_MIZQ6V1ZJU.jpg - cat
