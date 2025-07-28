@@ -3,15 +3,15 @@
 // import * as imageConversion from 'node_modules/image-conversion/build/conversion.js';
 // const imageConversion = require("image-conversion") // import the libary for image conversion
 
-
 const convertBTN = document.querySelector(".convertBTN"); // NOTE: ALWAYS PUT A BLOODY FULL STOP when calling a class
 const btnText = document.getElementById("btnText")
 const inpURL = document.getElementById("inputURL")
-// inpURL.addEventListener("submit", )
 convertBTN.addEventListener("click", convert) // add event listener for mouse clicks
 
 var url = inpURL.value // global / hoisted var
 var urlList = [];
+
+var targetType = "png"
 
 // check if Library is loaded
 
@@ -47,7 +47,6 @@ function hasURL(  ) { // check if the input box contains a valid url
 }
 
 function isPNG(type) {
-    console.log("checking if png")
     if (type=="png") { return true;}
     return false;
 }
@@ -71,7 +70,6 @@ async function convert() {
 
         console.log("converting the file: " + url);
         btnText.textContent = "Converting"
-
         
         // attempt 2
         let response = await fetch(url)
@@ -82,7 +80,14 @@ async function convert() {
             quality: 1.0,
             type: "image/png"}
         );
-        imageConversion.downloadFile(pngIMG)
+
+        let parts = url.split("/")
+        let filename = parts[parts.length-1]
+        // get the substring from index 0 , until and excluding the last 4 characters (which are the full stop and file extension)
+        let newFname = filename.substring(0,filename.length-3) +  targetType // + "png"
+        // alert(filename) //  testing purposes
+
+        imageConversion.downloadFile(pngIMG, newFname) // download image with new filename as associated file name
 
         // attempt 3
         // 1. First await the fetch to get the Response object
