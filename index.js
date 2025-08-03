@@ -9,10 +9,10 @@ const inpURL = document.getElementById("inputURL")
 const urlBox = document.getElementById("urlBox")
 convertBTN.addEventListener("click", convert) // add event listener for mouse clicks
 
-inpURL.addEventListener("change", getPreviewName() )
+inpURL.addEventListener("change", getPreviewName )
 
-urlBox.addEventListener("mouseover", previewHover(true))
-urlBox.addEventListener("mouseout", previewHover(false))
+urlBox.addEventListener("mouseover", () => previewHover(true)) // need to wrap the calls in arrow functions for it work
+urlBox.addEventListener("mouseout", () => previewHover(false)) // ^ same here
 
 var url = inpURL.value // global / hoisted var
 var urlList = [];
@@ -34,8 +34,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // proceed
 
-function updateURL() { // get most recent url
-    url = inpURL.value
+function updateURL() { 
+    url = inpURL.value // get most recent url
     urlList.push(url)
 
 
@@ -74,7 +74,7 @@ async function convert() {
     }
     else{ // then proceed with conversion
 
-        console.log("converting the file: " + url);
+        // console.log("converting the file: " + url);
         btnText.textContent = "Converting"
         
         // attempt 2
@@ -120,10 +120,20 @@ async function convert() {
 }
 
 function getPreviewName(name="", type=targetType){
-    let newName = name.substring(0, name.length-3) + type;
-    const fName = document.getElementById("namePreview")
+    // console.log(url + " is name")
+    if (name==""){
+        fName.innerHTML = "Preview filename: N/A";
+        return
+    }
+    updateURL() // void function : get the latest url
+    name = url
+
+    let parts = name.split("/") // split the url into different segments, seperated by the forward slash
+    let filename = parts[parts.length-1] // get the very last segment, which USUALLY is the filename
+    let newName = filename.substring(0, filename.length-3) + type;
+    const fName = document.getElementById("namePreview") // get the namePreview <p> element
     fName.innerHTML = "Preview filename: " + newName
-    return fName
+    // return fName // why was i returning the DOM element??
 }
 
 function previewHover(active) {
