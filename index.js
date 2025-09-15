@@ -1,6 +1,5 @@
+/* VARIABLES */
 // import * as imageConversion from 'image-conversion'; // import the libary for image conversion
-// import * as imageConversion from './node_modules/image-conversion/dist/image-conversion.min.js';
-// import * as imageConversion from 'node_modules/image-conversion/build/conversion.js';
 // const imageConversion = require("image-conversion") // import the libary for image conversion
 
 const convertBTN = document.querySelector(".convertBTN"); // NOTE: ALWAYS PUT A BLOODY FULL STOP when calling a class
@@ -8,11 +7,10 @@ const btnText = document.getElementById("btnText")
 const inpURL = document.getElementById("inputURL")
 const urlBox = document.getElementById("urlBox")
 convertBTN.addEventListener("click", convert) // add event listener for mouse clicks
-
 inpURL.addEventListener("change", getPreviewName )
 
-urlBox.addEventListener("mouseover", () => previewHover(true)) // need to wrap the calls in arrow functions for it work
-urlBox.addEventListener("mouseout", () => previewHover(false)) // ^ same here
+// urlBox.addEventListener("mouseover", () => previewHover(true)) // need to wrap the calls in arrow functions for it work
+// urlBox.addEventListener("mouseout", () => previewHover(false)) // ^ same here
 
 var url = inpURL.value // global / hoisted var
 var urlList = [];
@@ -32,12 +30,20 @@ document.addEventListener('DOMContentLoaded', () => {
 //   throw new Error("image-conversion library failed to load! Check the CDN script.");
 // }
 
-// proceed
+// CORS stuff
+// Alternative CORS proxies:
+const proxies = [
+  'https://api.codetabs.com/v1/proxy?quest=',
+  'https://corsproxy.io/?',
+  'https://proxy.cors.sh/'
+];
+
+
+/* METHODS */
 
 function updateURL() { 
     url = inpURL.value // get most recent url
     urlList.push(url)
-
 
     // check the most recent entered URL's \\
     // for (x in urlList){ // check whether url already exists in list
@@ -73,67 +79,55 @@ async function convert() {
         // setTimeout( close, 1000) // set timer for 1000ms(1s) and then close
     }
     else{ // then proceed with conversion
-
-        // console.log("converting the file: " + url);
         btnText.textContent = "Converting"
         
-        // attempt 2
-        let response = await fetch(url)
+        /* attempt 2 */
+        let response =  await fetch(url) //await fetch(`https://cors-anywhere.herokuapp.com/${url}`); //
         let blob = await response.blob()
         
-        // let pngIMG = await imageConversion.compress(blob,1.0)
-        let pngIMG = await imageConversion.compress(blob, {
+        // let pngIMG = await imageConversion.compress(blob,1.0) // test 2
+        let pngIMG = await imageConversion.compress(blob, { // test MAIN
             quality: 1.0,
             type: "image/png"}
         );
 
         let parts = url.split("/")
-        let filename = parts[parts.length-1]
-        // get the substring from index 0 , until and excluding the last 4 characters (which are the full stop and file extension)
-        // let newFname = filename.substring(0,filename.length-3) +  targetType // + "png"
+        let filename = parts[parts.length-1]// get the substring from index 0 , until and excluding the last 4 characters (which are the full stop and file extension)
+        
         let newFname= getPreviewName(filename, targetType)
         // alert(filename) //  testing purposes
 
+        console.log(newFname + " is new name | convert()")
         imageConversion.downloadFile(pngIMG, newFname) // download image with new filename as associated file name
-
-        // attempt 3
-        // 1. First await the fetch to get the Response object
-        // const response = await fetch(`https://cors-anywhere.herokuapp.com/${url}`);
-
-        // // 3. Now await the blob() method on the Response
-        // const blob = await response.blob();
-
-        // if (!blob.type.startsWith('image/')) {
-        //     throw new Error('The URL does not point to an image file');
-        // }
-        
-        // const pngBlob = await imageConversion.compress(blob, 1.0); // convert image
-
-        // imageConversion.downloadFile(pngBlob, "converted.png") // download
+        // imageConversion.downloadFile(pngIMG, "converted.png") // download with default name [ THIS WORKS]
+        /* END OF 2 */
 
         btnText.textContent = "Finished conversion"
         setTimeout( // reset the button text \\
             () => {btnText.textContent = "Convert"} // pass an arrow-function, so that text isn't immediately changed
             , 2000) // after 2 seconds
+
     }
 
 }
 
 function getPreviewName(name="", type=targetType){
-    // console.log(url + " is name")
-    if (name==""){
+    if (name==""){ // check for blanks
         fName.innerHTML = "Preview filename: N/A";
         return
     }
-    updateURL() // void function : get the latest url
+    updateURL() // void: get the latest url
     name = url
 
     let parts = name.split("/") // split the url into different segments, seperated by the forward slash
     let filename = parts[parts.length-1] // get the very last segment, which USUALLY is the filename
     let newName = filename.substring(0, filename.length-3) + type;
+    console.log(newName+ " is name | getPreviewName")
+
     const fName = document.getElementById("namePreview") // get the namePreview <p> element
     fName.innerHTML = "Preview filename: " + newName
-    // return fName // why was i returning the DOM element??
+    // return fName // why was i returning the DOM element?? // 
+    return newName;// BLOODY IDIOT. YOU'RE MEANT TO RETURN THE STRING, NOT THE DOM ELEMENT!!
 }
 
 function previewHover(active) {
