@@ -44,7 +44,8 @@ const proxies = [
 
 /* METHODS */
 
-function updateURL() { 
+function updateURL() 
+{ 
     url = inpURL.value // get most recent url
     urlList.push(url)
 
@@ -56,15 +57,58 @@ function updateURL() {
     // console.log(urlList)
 }
 
-// validations
-function hasURL(  ) { // check if the input box contains a valid url
+// validation checks
+function hasURL(  ) 
+{ // check if the input box contains a valid url
     if (url.length > 0){return true;}
     return false; 
 }
 
-function isPNG(type) {
+function isPNG(type) 
+{
     if (type=="png") { return true;}
     return false;
+}
+function isDuplicate(type)
+{
+    console.log("Type local: " + type + " | Type targetted:" + targetType)
+    if (type.toLowerCase() == targetType.toLowerCase()) { return true }
+    return false;
+}
+
+function isFromReddit(link) 
+{
+    let reddit = "preview.redd.it"
+    if (link.includes(reddit)) { 
+        // console.log("This is from reddit");
+
+        // alert("Redditor found!")
+
+        const img = document.createElement("redditImg")
+
+        // image attributes
+        img.src = "https://redditbrand.lingoapp.com/a/Reddit-Icon-FullColor-1E887y?asset_token=g1y2u50KuCzT5SDGlUBPx2EUVUbGQ8jbNtsP2kzawsI&v=42"
+        img.width = 300; img.height = 300;
+
+        // Set position using inline styles
+        img.style.position = 'absolute'; // or 'fixed', 'relative'
+        img.style.left = '1px';
+        img.style.top = '5px';
+        img.style.zIndex = '10';
+
+        // document.body.appendChild(img);
+
+        const preview = document.getElementById("imgPreview")
+        preview.appendChild(img)
+
+
+        console.log("This is from reddit");
+        return true 
+    }
+
+    console.log("NOT from reddit")
+    return false
+
 }
 //
 
@@ -72,14 +116,15 @@ function isPNG(type) {
 async function convert() {
     updateURL() // get latest url
     let fileExt = url.slice(url.length-3, url.length).toLowerCase()
-    
+    console.log(fileExt + " is fileExt")
     
     if (!hasURL()){ // first check if has a URL
        console.log("Empty / No URL")
        alert("No URL given") 
     } 
-    else if( isPNG(fileExt) ) { // then check if already png
-        console.log("This is already a PNG")
+    else if( isDuplicate(fileExt) ) { // then check if already png // isPNG(fileExt)
+        console.log("This is already a " + targetType) // console.log("This is already a PNG")
+        alert("This is already the desired file type.") 
         // setTimeout( close, 1000) // set timer for 1000ms(1s) and then close
     }
     else{ // then proceed with conversion
@@ -98,7 +143,7 @@ async function convert() {
         let parts = url.split("/")
         let filename = parts[parts.length-1]// get the substring from index 0 , until and excluding the last 4 characters (which are the full stop and file extension)
         
-        let newFname= getPreviewName(filename, targetType)
+        let newFname= getPreviewName(filename, targetType) // handle the file new naming here
         // console.log(newFname + " is new name | convert()")
         imageConversion.downloadFile(pngIMG, newFname) // download image with new filename as associated file name
         // imageConversion.downloadFile(pngIMG, "converted.png") // download with default name [ THIS WORKS]
@@ -124,21 +169,32 @@ function getPreviewName(name="", type=targetType){
     let parts = name.split("/") // split the url into different segments, seperated by the forward slash
     let filename = parts[parts.length-1] // get the very last segment, which USUALLY is the filename
     let newName = filename.substring(0, filename.length-3) + type;
-    // console.log(newName+ " is name | getPreviewName")
+
+    // check if from Reddit --> change filename
+    if ( isFromReddit(url) )
+    {
+        let end = filename.indexOf("?") // stopping newName by the first ? [This could change in future]
+        newName = filename.substring(0, end-3) + type; // subtracting by a vaalue from the end position, to remove the original fileType.
+        // subtracting from 3 works on the latest version of reddit [15/12/2025]
+    }
 
     const fName = document.getElementById("namePreview") // get the namePreview <p> element
     fName.innerHTML = "Preview filename: " + newName
+
+
     // return fName // why was i returning the DOM element?? // 
     return newName;// BLOODY IDIOT. YOU'RE MEANT TO RETURN THE STRING, NOT THE DOM ELEMENT!!
 }
 
-function setFileType(){ //
+function setFileType() //
+{ 
     let type = document.getElementById('fType-select').value.toLowerCase()
     // console.log("Type is: " + type)
     targetType = type
 }
 
-function previewHover(active) {
+function previewHover(active) 
+{
     const fName = document.getElementById("namePreview")
     if (active) {
         fName.classList.add("preview-animated");
@@ -150,6 +206,13 @@ function previewHover(active) {
 // test image (THESE ARE CC-0):
 /*  https://cdn.stocksnap.io/img-thumbs/280h/house-cat_MIZQ6V1ZJU.jpg - cat
     https://w0.peakpx.com/wallpaper/333/363/HD-wallpaper-joker-cool.jpg - joker why so serious
+
+    Reddit:
+    https://preview.redd.it/credits-for-backround-image-to-u-hopeful-fix-41-v0-wu6dctg1v87g1.png?width=640&crop=smart&auto=webp&s=42aeea39b5c1e000c845fbaac6d912094ef06ae7
+    https://preview.redd.it/m0f0yi1hwi6g1.png?width=320&crop=smart&auto=webp&s=8031739885a102091b10f5276b902fc14e6ec47a
+    https://preview.redd.it/yn6vf345nk6g1.jpeg?width=640&crop=smart&auto=webp&s=bb15357e103645647bacf128cb90674f08102fae
+    https://preview.redd.it/advice-for-you-ladies-out-there-v0-5ve9q5sbhw6g1.png?width=320&crop=smart&auto=webp&s=a2b039bee1a6bacf9b0abe86ed34cc5667194300
+
 */
 
 
