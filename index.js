@@ -64,14 +64,10 @@ function hasURL(  )
     return false; 
 }
 
-function isPNG(type) 
+
+function isDesiredType(type) // check if the current image is the same as the desired link
 {
-    if (type=="png") { return true;}
-    return false;
-}
-function isDuplicate(type)
-{
-    console.log("Type local: " + type + " | Type targetted:" + targetType)
+    // console.log("Type local: " + type + " | Type targetted: " + targetType)
     if (type.toLowerCase() == targetType.toLowerCase()) { return true }
     return false;
 }
@@ -115,14 +111,18 @@ function isFromReddit(link)
 
 async function convert() {
     updateURL() // get latest url
-    let fileExt = url.slice(url.length-3, url.length).toLowerCase()
-    console.log(fileExt + " is fileExt")
+
+    // split and process the URL string. Get the new fileName from
+    let parts = url.split("/")
+    let filename = parts[parts.length-1]// get the substring from index 0 , until and excluding the last 4 characters (which are the full stop and file extension)
+    let newFname= getPreviewName(filename, targetType, true) // handle the file new naming here
+    let fileExtension = newFname.slice(newFname.length-3, newFname.length).toLowerCase() // retrieve only the file Extensions (.png, .jpg)
     
     if (!hasURL()){ // first check if has a URL
        console.log("Empty / No URL")
        alert("No URL given") 
     } 
-    else if( isDuplicate(fileExt) ) { // then check if already png // isPNG(fileExt)
+    else if( isDuplicate(fileExtension) ) { // then check if file is it's desired fileType.
         console.log("This is already a " + targetType) // console.log("This is already a PNG")
         alert("This is already the desired file type.") 
         // setTimeout( close, 1000) // set timer for 1000ms(1s) and then close
@@ -130,7 +130,7 @@ async function convert() {
     else{ // then proceed with conversion
         btnText.textContent = "Converting"
         
-        /* attempt 2 */
+
         let response =  await fetch(url) //await fetch(`https://cors-anywhere.herokuapp.com/${url}`); //
         let blob = await response.blob()
         
@@ -140,14 +140,14 @@ async function convert() {
             type: "image/png"}
         );
 
-        let parts = url.split("/")
-        let filename = parts[parts.length-1]// get the substring from index 0 , until and excluding the last 4 characters (which are the full stop and file extension)
+        // let parts = url.split("/")
+        // let filename = parts[parts.length-1]// get the substring from index 0 , until and excluding the last 4 characters (which are the full stop and file extension)
         
-        let newFname= getPreviewName(filename, targetType) // handle the file new naming here
+        // let newFname= getPreviewName(filename, targetType) // handle the file new naming here
         // console.log(newFname + " is new name | convert()")
         imageConversion.downloadFile(pngIMG, newFname) // download image with new filename as associated file name
         // imageConversion.downloadFile(pngIMG, "converted.png") // download with default name [ THIS WORKS]
-        /* END OF 2 */
+
 
         btnText.textContent = "Finished conversion"
         setTimeout( // reset the button text \\
@@ -158,8 +158,8 @@ async function convert() {
 
 }
 
-function getPreviewName(name="", type=targetType){
-    if (name==""){ // check for blanks
+function getPreviewName(name="", type=targetType, withExtension=false){
+    if (name=="" || name==" "){ // check for blanks
         fName.innerHTML = "Preview filename: N/A";
         return
     }
@@ -174,8 +174,11 @@ function getPreviewName(name="", type=targetType){
     if ( isFromReddit(url) )
     {
         let end = filename.indexOf("?") // stopping newName by the first ? [This could change in future]
-        newName = filename.substring(0, end-3) + type; // subtracting by a vaalue from the end position, to remove the original fileType.
+        let subtractFactor = 3
+        if (withExtension) { subtractFactor = 0; type="" } // subtracting by a value from the end position, to remove the original fileType.
         // subtracting from 3 works on the latest version of reddit [15/12/2025]
+
+        newName = filename.substring(0, end-subtractFactor) + type;
     }
 
     const fName = document.getElementById("namePreview") // get the namePreview <p> element
@@ -189,7 +192,6 @@ function getPreviewName(name="", type=targetType){
 function setFileType() //
 { 
     let type = document.getElementById('fType-select').value.toLowerCase()
-    // console.log("Type is: " + type)
     targetType = type
 }
 
@@ -202,6 +204,13 @@ function previewHover(active)
     } else {fName.classList.remove("preview-animated"); console.log("mouse exit preview")}
     
 }
+
+/* TO-DO:
+* Create a horizontal gallery of the most recent converted images. Display them there, in small image.
+*
+
+
+*/
 
 // test image (THESE ARE CC-0):
 /*  https://cdn.stocksnap.io/img-thumbs/280h/house-cat_MIZQ6V1ZJU.jpg - cat
