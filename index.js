@@ -8,20 +8,21 @@ const inpURL = document.getElementById("inputURL")
 const urlBox = document.getElementById("urlBox")
 convertBTN.addEventListener("click", convert) // add event listener for mouse clicks
 inpURL.addEventListener("change", getPreviewName )
+inpURL.addEventListener("submit", getPreviewName)
 
-const fTypeMenu = document.getElementById('fType-select')
-fTypeMenu.addEventListener("change", setFileType) // change better than run for this
+const fileTypeMenu = document.getElementById('fType-select')
+fileTypeMenu.addEventListener("change", function(event){ // using wrapper function to: change file type + get new name
+    setFileExtension(event); getPreviewName();
+})
 
 // urlBox.addEventListener("mouseover", () => previewHover(true)) // need to wrap the calls in arrow functions for it work
 // urlBox.addEventListener("mouseout", () => previewHover(false)) // ^ same here
 
 var url = inpURL.value // global / hoisted var
 var urlList = [];
-
 var targetType = "png" // default
 
-// check if Library is loaded
-
+// check if Library is loaded 
 document.addEventListener('DOMContentLoaded', () => {
     // Check if the library is loaded
     if (typeof imageConversion === 'undefined') {
@@ -44,7 +45,7 @@ const proxies = [
 
 /* METHODS */
 
-function updateURL() 
+function updateURL() // get text from box AND set the new value of ur;
 { 
     url = inpURL.value // get most recent url
     urlList.push(url)
@@ -74,7 +75,7 @@ function isDesiredType(type) // check if the current image is the same as the de
 
 function isFromReddit(link) 
 {
-    let reddit = "preview.redd.it"
+    const reddit = "preview.redd.it"
     if (link.includes(reddit)) { 
         // console.log("This is from reddit");
 
@@ -99,6 +100,7 @@ function isFromReddit(link)
 
 
         console.log("This is from reddit");
+        console.log("");
         return true 
     }
 
@@ -112,87 +114,106 @@ function isFromReddit(link)
 async function convert() {
     updateURL() // get latest url
 
+    console.log(targetType + " is targetType before URl processing")
+
     // split and process the URL string. Get the new fileName from
-    let parts = url.split("/")
-    let filename = parts[parts.length-1]// get the substring from index 0 , until and excluding the last 4 characters (which are the full stop and file extension)
-    let newFname= getPreviewName(filename, targetType, true) // handle the file new naming here
-    let fileExtension = newFname.slice(newFname.length-3, newFname.length).toLowerCase() // retrieve only the file Extensions (.png, .jpg)
+    const filename = getFileName(url)
+    // console.log(filename + " is the fileName retrieved")
+
+    let newFileName= getPreviewName(filename, targetType, true) // handle the new filenaming here
+    let fileExtension = newFileName.slice(newFileName.length-3, newFileName.length).toLowerCase() // retrieve only the file Extensions (.png, .jpg)
     
+    // console.log(fileExtension + " is the new extension BEFORE CONVERT")
+    // console.log(targetType + " is targetType after URl processing")
+
     if (!hasURL()){ // first check if has a URL
        console.log("Empty / No URL")
        alert("No URL given") 
+       return
     } 
-    else if( isDuplicate(fileExtension) ) { // then check if file is it's desired fileType.
-        console.log("This is already a " + targetType) // console.log("This is already a PNG")
-        alert("This is already the desired file type.") 
-        // setTimeout( close, 1000) // set timer for 1000ms(1s) and then close
-    }
-    else{ // then proceed with conversion
-        btnText.textContent = "Converting"
-        
+
+    btnText.textContent = "Converting"
+
+    //Proceed with conversion and Download
+    try{
+        // btnText.textContent = "Converting"
 
         let response =  await fetch(url) //await fetch(`https://cors-anywhere.herokuapp.com/${url}`); //
         let blob = await response.blob()
         
-        // let pngIMG = await imageConversion.compress(blob,1.0) // test 2
-        let pngIMG = await imageConversion.compress(blob, { // test MAIN
-            quality: 1.0,
-            type: "image/png"}
-        );
 
-        // let parts = url.split("/")
-        // let filename = parts[parts.length-1]// get the substring from index 0 , until and excluding the last 4 characters (which are the full stop and file extension)
-        
-        // let newFname= getPreviewName(filename, targetType) // handle the file new naming here
-        // console.log(newFname + " is new name | convert()")
-        imageConversion.downloadFile(pngIMG, newFname) // download image with new filename as associated file name
+        let imageTypeString = "image/" + targetType // create a string of the image
+        // let newImage = await imageConversion.compress(blob,1.0) // test 2
+        // let newImage = await imageConversion.compress(blob, {  quality: 1.0, type: "image/png" })
+        let newImage = await imageConversion.compress(blob, {  quality: 1.0, type: imageTypeString })
+
+        console.log(fileExtension + " is the new extension ADTER CONVERT")
+        imageConversion.downloadFile(newImage, newFileName) // download image with new filename as associated file name
         // imageConversion.downloadFile(pngIMG, "converted.png") // download with default name [ THIS WORKS]
 
 
         btnText.textContent = "Finished conversion"
-        setTimeout( // reset the button text \\
-            () => {btnText.textContent = "Convert"} // pass an arrow-function, so that text isn't immediately changed
-            , 2000) // after 2 seconds
-
+        // reset the button text by passing arrow-function, so that text isn't immediately changed
+        setTimeout( () => {btnText.textContent = "Convert"} , 2000 ) 
     }
+    catch(error)
+    {
+        alert("Failed to convert: " + error)
+        btnText.textContent = "Error converting"
+        // reset the button text by passing arrow-function, so that text isn't immediately changed
+        setTimeout( () => {btnText.textContent = "Convert"} , 2000 ) 
+    }
+    
 
 }
 
-function getPreviewName(name="", type=targetType, withExtension=false){
-    if (name=="" || name==" "){ // check for blanks
-        fName.innerHTML = "Preview filename: N/A";
-        return
-    }
-    updateURL() // void: get the latest url
-    name = url
+function getFileName(URL){
+    const parts = URL.split("/") // split the url into different segments, seperated by the forward slash
+    const fileName = parts[parts.length-1] // get the very last segment, which USUALLY is the filename
+    // index 0 , until and excluding the last 4 characters (which are the full stop and file extension)
+    return fileName
+}
 
-    let parts = name.split("/") // split the url into different segments, seperated by the forward slash
-    let filename = parts[parts.length-1] // get the very last segment, which USUALLY is the filename
-    let newName = filename.substring(0, filename.length-3) + type;
+function getPreviewName(name="", type, withExtension=false){
+    const namePreview = document.getElementById("namePreview") // get the namePreview <p> element
+    // Validate input
+    // if (name.trim=="" || !name){
+    //     namePreview.innerHTML = "Preview filename: N/A";
+    //     return
+    // }
+
+    updateURL() // void: get the latest url
+    const currentUrl = url
+    // type = type || targetType;
+    type = getFileExtension()
+    let extension = getFileExtension() // targetType
+
+    const filename = getFileName(currentUrl);
+    let newName = filename.substring(0, filename.length-3) + extension; // type
 
     // check if from Reddit --> change filename
     if ( isFromReddit(url) )
     {
-        let end = filename.indexOf("?") // stopping newName by the first ? [This could change in future]
-        let subtractFactor = 3
-        if (withExtension) { subtractFactor = 0; type="" } // subtracting by a value from the end position, to remove the original fileType.
-        // subtracting from 3 works on the latest version of reddit [15/12/2025]
+        const end = filename.indexOf("?") // stopping newName by the first ? [This could change in future]
+        let subtractFactor = 3 // subtracting from 3 works on the latest version of reddit [15/12/2025]
+        if (withExtension) { subtractFactor = 0; extension="" } // subtracting by a value from the end position, to remove the original fileType.
 
-        newName = filename.substring(0, end-subtractFactor) + type;
+        newName = filename.substring(0, end-subtractFactor) + extension
     }
 
-    const fName = document.getElementById("namePreview") // get the namePreview <p> element
-    fName.innerHTML = "Preview filename: " + newName
-
+    // const namePreview = document.getElementById("namePreview") // get the namePreview <p> element
+    namePreview.innerHTML = "Preview filename: " + newName
 
     // return fName // why was i returning the DOM element?? // 
     return newName;// BLOODY IDIOT. YOU'RE MEANT TO RETURN THE STRING, NOT THE DOM ELEMENT!!
 }
 
-function setFileType() //
+function getFileExtension() { return targetType }
+function setFileExtension() // Get value from the selcted box
 { 
     let type = document.getElementById('fType-select').value.toLowerCase()
     targetType = type
+    console.log("NEW TYPE SET TO: " + targetType);
 }
 
 function previewHover(active) 
